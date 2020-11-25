@@ -1,5 +1,5 @@
-const { Users } = require('../models')
-const { createJwt } = require('../utils/jwt')
+import { Users } from '../models/index.js';
+import { createJwt } from '../utils/jwt.js';
 
 async function createUser(userOpts) {
   if (!userOpts.username) {
@@ -20,6 +20,7 @@ async function createUser(userOpts) {
     throw new Error('Error creating user')
   }
 
+
   const createdUser = await Users.findOne({
     attributes: ['email', 'username', 'bio', 'image'],
     where: {
@@ -33,6 +34,8 @@ async function createUser(userOpts) {
     token
   }
 }
+
+
 
 async function verifyUser(userOpts) {
   if (!userOpts.email) {
@@ -56,16 +59,54 @@ async function verifyUser(userOpts) {
   if (user.password !== userOpts.password) {
     throw new Error('Password does not match')
   }
+  
   const token = await createJwt(user.get())
-  const userJson = {
+  const userJson = {user:{
     ...user.get(),
     token
-  }
-  delete userJson.password
+  }}
+  delete userJson.user.password
   return userJson
 }
 
-module.exports = {
-  createUser,
-  verifyUser
+
+async function updateUser(userOpts) {
+  console.log(userOpts);
+  const user = await Users.findOne({
+    attributes: ['email', 'username', 'bio', 'image', 'password'],
+    where: {
+         email:  userOpts.email 
+    }
+  })
+
+  if (!user) {
+    throw new Error('No user with given email address')
+  }
+  // console.log("user");
+  // console.log(user.dataValues);
+  // console.log("user");
+  
+  const updatedUser = await Users.update(userOpts, {
+    where: {
+      email : userOpts.email 
+    }
+  });
+  console.log(updatedUser)
+
+  const useru = {user: await Users.findOne({
+    attributes: ['email', 'username', 'bio', 'image'],
+    where: {
+         email:  userOpts.email 
+    }
+  })}
+
+  console.log(useru)
+  // return updatedUser;
+  return useru;
+}
+
+export {
+    createUser,
+    updateUser,
+    verifyUser
 }
