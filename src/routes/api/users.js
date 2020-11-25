@@ -1,25 +1,27 @@
-const { Router } = require('express')
-const { createUser, verifyUser } = require('../../controllers/users')
+import express from 'express';
+import bodyParser from 'body-parser';
+import { createUser , verifyUser} from '../../controllers/users.js';
 
-const route = Router()
+const router = express.Router();
 
-route.post('/', async (req, res) => {
-  const createdUser = await createUser(req.body.user)
-  res.send(createdUser)
+router.post('/', async (req, res)=>{
+    console.log(req.body);
+    const createdUser = await createUser(req.body.user)
+    res.send(createdUser)
 })
 
-route.post('/login', async (req, res) => {
-  try {
-    const verifiedUser = await verifyUser(req.body.user)
-    res.send(verifiedUser)
-  } catch (err) {
-    res.status(403).send({
-      errors: {
-        body: [ err.message ]
-      }
-    })
-  }
-})
+router.post('/login', async (req, res) => {
+    try {
+      const verifiedUser = await verifyUser(req.body.user);
+      res.send(verifiedUser);
+    } catch (err) {
+      res.status(403).send({
+        errors: {
+          body: [ err.message ]
+        }
+      })
+    }
+  })
 
 
-module.exports = route
+export default router ; 
