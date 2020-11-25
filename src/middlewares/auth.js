@@ -1,4 +1,4 @@
-const { verifyJwt } = require('../utils/jwt')
+import { verifyJwt } from '../utils/jwt.js';
 
 async function userAuthViaToken(req, res, next) {
   const auth = req.header('Authorization')
@@ -26,6 +26,7 @@ async function userAuthViaToken(req, res, next) {
   try {
     const user = await verifyJwt(token)
     req.user = user
+    
     return next()
   } catch (err) {
     res.status(403).send({
@@ -39,6 +40,6 @@ async function userAuthViaToken(req, res, next) {
 
 }
 
-module.exports = {
+export {
   userAuthViaToken
-}
+};
