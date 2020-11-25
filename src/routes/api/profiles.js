@@ -1,17 +1,58 @@
-const { Router } = require('express')
+import express from 'express';
+import { displayProfile } from '../../controllers/profiles.js'
+import { followProfile, unfollowProfile } from '../../controllers/profiles.js'
+import { userAuthViaToken } from '../../middlewares/auth.js'
+const router = express.Router();
 
-const route = Router()
+// GET /api/profiles/:username
 
-// Get a profile
-route.get('/:username', (req, res) => {
-  res.send({
-    "profile": {
-      "username": req.params.username,
-      "bio": "I work at statefarm",
-      "image": "https://static.productionready.io/images/smiley-cyrus.jpg",
-      "following": false
+router.get('/:username', userAuthViaToken ,async (req, res) =>{
+    try{
+    const profile = await displayProfile(req.user.username,req.params);
+    res.json(profile);
+    } catch (err) {
+      res.status(403).send({
+        errors: {
+          body: [ err.message ]
+        }
+      });
     }
-  })
-})
+});
 
-module.exports = route
+// POST /api/profiles/:username/follow
+
+router.post('/:username/follow', userAuthViaToken ,async (req, res) =>{
+  if(req.user){
+  try{
+  await followProfile(req.user.username,req.params);
+  const profile = await displayProfile(req.user.username,req.params);
+  res.json(profile);
+  } catch (err) {
+    res.status(403).send({
+      errors: {
+        body: [ err.message ]
+      }
+    });
+  }
+  }
+});
+
+// DELETE /api/profiles/:username/follow
+
+router.delete('/:username/follow', userAuthViaToken ,async (req, res) =>{
+  if(req.user){
+  try{
+  await unfollowProfile(req.user.username,req.params);
+  const profile = await displayProfile(req.user.username,req.params);
+  res.json(profile);
+  } catch (err) {
+    res.status(403).send({
+      errors: {
+        body: [ err.message ]
+      }
+    });
+  }
+  }
+});
+
+export default router ;
