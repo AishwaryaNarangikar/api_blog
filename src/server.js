@@ -1,22 +1,25 @@
-const express = require('express')
-const { db } = require('./models')
+import express from 'express';
+import bodyParser from 'body-parser';
+import apiRoutes from './routes/api/index.js';
+import { db } from './models/index.js';
 
-const app = express()
+const app = express();
+const PORT = 3000;
 
-// For POST requests
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({
+//     extended: true
+//   }));
+  
+// app.use('/users',usersRoutes);
+app.use('/api', apiRoutes)
 
-// Routes
-app.use('/api', require('./routes/api'))
+app.get('/', (req,res) =>res.send('Welcome to the Blog'));
 
 db.sync()
-  .then(() => {
-    app.listen(7788, () => {
-      console.log('Server started on http://localhost:7788/')
+    .then(()=>{
+        app.listen(PORT, () =>console.log(`Server running on port: http://localhost:${PORT}`));
     })
-  })
-  .catch(err => {
-    console.error(err)
-  })
-
+    .catch(err =>{
+        console.error(err)
+    })
