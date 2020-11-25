@@ -1,13 +1,41 @@
-const { Router } = require('express')
-const { userAuthViaToken } = require('../../middlewares/auth')
+  
+import express from 'express';
 
-const route = Router()
+import { userAuthViaToken } from '../../middlewares/auth.js';
 
-route.get('/', userAuthViaToken, (req, res) => {
+import { updateUser } from '../../controllers/users.js';
+
+const router = express.Router();
+
+router.get('/', userAuthViaToken, (req, res) => {
   if (req.user) {
+    delete (req.user.password)
+    delete (req.user.iat)
     res.send(req.user)
   }
 })
 
 
-module.exports = route
+router.put('/', userAuthViaToken, async ( req , res) => {
+    console.log(req.body.user)
+    if (req.user){
+
+        try {
+            const updatedUser = await updateUser(req.body.user);
+            res.send(updatedUser);
+          } catch (err) {
+            res.status(403).send({
+              errors: {
+                body: [ err.message ]
+              }
+            })
+          }
+          
+    }
+    
+  })
+
+
+
+
+export default router ;
