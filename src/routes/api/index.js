@@ -1,11 +1,21 @@
-const { Router } = require('express')
+import express from 'express';
 
-const route = Router()
+import usersRoutes from './users.js';
 
-route.use('/users', require('./users'))
-route.use('/user', require('./user'))
-route.use('/profiles', require('./profiles'))
-route.use('/tags', require('./tags'))
-route.use('/articles', require('./articles'))
+import userRoutes from './user.js';
 
-module.exports = route
+import profilesRoutes from './profiles.js';
+
+import tagsRoutes from './tags.js';
+
+import articlesRoutes from './articles/index.js';
+
+const router = express.Router();
+
+router.use('/users', usersRoutes);
+router.use('/user',userRoutes);
+router.use('/profiles',profilesRoutes);
+router.use('/tags',tagsRoutes);
+router.use('/articles',articlesRoutes);
+
+export default router ;
